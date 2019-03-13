@@ -59,6 +59,12 @@ class BookInstance(models.Model):
     due_back = models.DateField(null=True, blank=True)
     borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+        return False
+    
     LOAN_STATUS = (
         ('m', 'Maintenance'),
         ('o', 'On loan'),
@@ -71,14 +77,7 @@ class BookInstance(models.Model):
         choices = LOAN_STATUS,
         blank = True,
         default = 'm',
-        help_text = 'Book Availability',
-    )
-
-    @property
-    def is_overdue(self):
-        if self.due_back and date.today() > self.due_back:
-            return True
-        return False
+        help_text = 'Book Availability')
 
     class Meta:
         ordering = ['due_back']
@@ -86,14 +85,14 @@ class BookInstance(models.Model):
 
         def __str__(self):
             """String for representing the Model object."""
-            return f'{self.id} ({self.book.title})'
+            return '{0} ({1})'.format(self.id, self.book.title)
 
 class Author(models.Model):
     """Model representing an author."""
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(null=True, blank=True)
-    date_of_death = models.DateField('Died', null=True, blank=True)
+    date_of_death = models.DateField('died', null=True, blank=True)
 
     class Meta:
         ordering = ['last_name', 'first_name']
